@@ -1,7 +1,20 @@
 import pandas as pd
 import numpy as np
+import math
 
-def perceptron(max_it, alpha, df):
+def degrau(x):
+    if x >=0:
+        return 1
+    else:
+        return 0
+
+def sigmoidal(x):
+    if x >= 0:
+        return 1 / (1 + math.exp(-x))
+    else:
+        return math.exp(x) / (1 + math.exp(-x))
+
+def perceptron(max_it, alpha, df, function):
     W = np.array([[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]])
     b = np.array([[0], [0], [0]])
     Ep = []
@@ -12,11 +25,13 @@ def perceptron(max_it, alpha, df):
         for i in range(0, len(df)):
             x = np.transpose([df.values[i][0:6]])
             y = W.dot(x) + b
-            e = np.array(df.values[i][6]) - y
-            W = W + alpha*e.dot(x.T)
+            y = np.array(list(map(function, y)))
+            e = np.array(df.values[i][6]).T - y
+            W = W + alpha*e.T.dot(x.T)
             b = b + alpha*E
             E = E + e.dot(e.T)
         Ep.append(E)
+        t += 1
     return W, b
 
 if __name__ == "__main__":
@@ -55,4 +70,4 @@ if __name__ == "__main__":
     df_tests = df_tests.sample(frac=1)
     df_training = df_training.sample(frac=1)
 
-    perceptron(5, 0.1, df_training)
+    perceptron(5, 0.1, df_training, degrau)
