@@ -67,7 +67,7 @@ def perceptron_test(df, W, b, function):
 if __name__ == "__main__":
 
     # Seed to randomize dfs
-    seed = 3
+    seed = 4
 
     df = pd.read_csv("./dataframe.csv")
 
@@ -103,6 +103,7 @@ if __name__ == "__main__":
     df_tests = df_tests.sample(frac=1, random_state=seed)
     df_training = df_training.sample(frac=1, random_state=seed)
 
+    # Train weights and bias
     weightD, biasD = perceptron(10, 0.001, df_training, degrau)
     weightS, biasS = perceptron(10, 0.001, df_training, sigmoidal)
 
@@ -112,7 +113,7 @@ if __name__ == "__main__":
     print("Peso Sigmoidal: \n", weightS)
     print("Bias Sigmoidal: \n", biasS)
 
-
+    # Run tests
     accuracyD = perceptron_test(df_tests, weightD, biasD, degrau)
     accuracyS = perceptron_test(df_tests, weightS, biasS, sigmoidal)
 
