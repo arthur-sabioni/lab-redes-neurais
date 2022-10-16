@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import math
 
 def degrau(x):
     x = x[0]
@@ -12,9 +11,13 @@ def degrau(x):
 def sigmoidal(x):
     x = x[0]
     if x >= 0:
-        return 1 / (1 + math.exp(-x))
+        if x>500: # Prevent overflow
+            x = 500
+        return 1 / (1 + np.exp(-x))
     else:
-        return math.exp(x) / (1 + math.exp(-x))
+        if x<-500: # Prevent overflow
+            x = -500
+        return np.exp(x) / (1 + np.exp(-x))
 
 def perceptron(max_it, alpha, df, function):
     W = np.array([[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]])
@@ -39,9 +42,23 @@ def perceptron(max_it, alpha, df, function):
 def perceptron_test(df, W, b, function):
     hits = 0
     for i in range(0, len(df)):
+
         x = np.transpose([df.values[i][0:6]])
         y = W.dot(x) + b
         y = np.array([list(map(function, y))]).T
+
+        # Filter sigmoidal values to become 1 if bigger or 0 if not
+        if(function == sigmoidal):
+            bigger = y[0][0]
+            for j in y:
+                if j[0] > bigger:
+                    bigger = j[0]
+            for j in y:
+                if j[0] == bigger:
+                    y[np.where(y == j)] = [1]
+                else:
+                    y[np.where(y == j)] = [0]
+
         e = df.values[i][6] - y
         if(np.all(e == 0)):
             hits += 1
@@ -86,13 +103,19 @@ if __name__ == "__main__":
     df_tests = df_tests.sample(frac=1, random_state=seed)
     df_training = df_training.sample(frac=1, random_state=seed)
 
-    weight, bias = perceptron(5, 0.1, df_training, degrau)
+    weightD, biasD = perceptron(10, 0.001, df_training, degrau)
+    weightS, biasS = perceptron(10, 0.001, df_training, sigmoidal)
 
     print("Treinamento Concluído")
-    print("Peso: \n", weight)
-    print("Bias: \n", bias)
+    print("Peso Degrau: \n", weightD)
+    print("Bias Degrau: \n", biasD)
+    print("Peso Sigmoidal: \n", weightS)
+    print("Bias Sigmoidal: \n", biasS)
 
-    accuracy = perceptron_test(df_tests, weight, bias, degrau)
 
-    print("Teste Concluído")
-    print("Acurracy: %.2f" % accuracy)
+    accuracyD = perceptron_test(df_tests, weightD, biasD, degrau)
+    accuracyS = perceptron_test(df_tests, weightS, biasS, sigmoidal)
+
+    print("\nTeste Concluído")
+    print("Acurracy Degrau: %.2f" % accuracyD)
+    print("Acurracy Sigmoidal: %.2f" % accuracyS)
