@@ -1,6 +1,22 @@
 import pandas as pd
 import numpy as np
 
+import matplotlib.pyplot as plt
+
+def plot_2d(errors, title=""):
+
+    fig = plt.figure()
+    fig.suptitle(title)
+
+    x = np.linspace(start=0, stop=len(errors)-1, num=len(errors))
+
+    # Compute data in percentage (100 is the expected result)
+    plt.plot(x, np.array(errors))
+
+    plt.xlabel('Iteracao')
+    plt.ylabel('Erro')
+    fig.show()
+
 def degrau(x):
     x = x[0]
     if x >=0:
@@ -33,10 +49,11 @@ def perceptron(max_it, alpha, df, function):
             y = np.array([list(map(function, y))]).T
             e = df.values[i][6] - y
             W = W + alpha*e.dot(x.T)
-            b = b + alpha*E
+            b = b + alpha*e
             E = E + e.T.dot(e)[0][0]
         Ep.append(E)
         t += 1
+    plot_2d(Ep, function.__name__)
     return W, b
 
 def perceptron_test(df, W, b, function):
@@ -104,8 +121,8 @@ if __name__ == "__main__":
     df_training = df_training.sample(frac=1, random_state=seed)
 
     # Train weights and bias
-    weightD, biasD = perceptron(10, 0.001, df_training, degrau)
-    weightS, biasS = perceptron(10, 0.001, df_training, sigmoidal)
+    weightD, biasD = perceptron(100, 0.0001, df_training, degrau)
+    weightS, biasS = perceptron(100, 0.0001, df_training, sigmoidal)
 
     print("Treinamento Concluído")
     print("Peso Degrau: \n", weightD)
