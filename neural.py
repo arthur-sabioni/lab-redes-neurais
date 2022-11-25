@@ -121,8 +121,8 @@ if __name__ == "__main__":
     df_training = df_training.sample(frac=1, random_state=seed)
 
     # Train weights and bias
-    weightD, biasD = perceptron(100, 0.0001, df_training, degrau)
-    weightS, biasS = perceptron(100, 0.0001, df_training, sigmoidal)
+    weightD, biasD = perceptron(20, 0.1, df_training, degrau)
+    weightS, biasS = perceptron(20, 0.1, df_training, sigmoidal)
 
     print("Treinamento Concluído")
     print("Peso Degrau: \n", weightD)
@@ -137,3 +137,5 @@ if __name__ == "__main__":
     print("\nTeste Concluído")
     print("Acurracy Degrau: %.2f" % accuracyD)
     print("Acurracy Sigmoidal: %.2f" % accuracyS)
+
+    plt.show()
